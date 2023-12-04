@@ -11,13 +11,15 @@ import (
 	"time"
 )
 
-type contents struct {
-	Content []struct {
-		OrderId     int64  `json:"order_id"`
-		Status      string `json:"status"`
-		StoreId     int64  `json:"store_id"`
-		DateCreated string `json:"date_created"`
-	} `json:"content"`
+type Order struct {
+	OrderId     int64  `json:"order_id"`
+	Status      string `json:"status"`
+	StoreId     int64  `json:"store_id"`
+	DateCreated string `json:"date_created"`
+}
+
+type DTO struct {
+	Orders []Order `json:"content"`
 }
 
 type connectionStrings struct {
@@ -30,7 +32,7 @@ type connectionStrings struct {
 func main() {
 
 	for {
-		orders := contents{}
+		var dto DTO
 
 		DBconnectionString := connectionStrings{
 			user:     "myUser",
@@ -56,7 +58,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		err = json.Unmarshal(body, &orders)
+		err = json.Unmarshal(body, &dto)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -76,10 +78,10 @@ func main() {
 		sqlStatement := `INSERT INTO list_orders (OrderId, Status, StoreId, DateCreated) VALUES ($1, $2, $3, $4)`
 
 		_, err = db.Exec(sqlStatement,
-			orders.Content[0].OrderId,
-			orders.Content[0].Status,
-			orders.Content[0].StoreId,
-			orders.Content[0].DateCreated)
+			dto.Orders[0].OrderId,
+			dto.Orders[0].Status,
+			dto.Orders[0].StoreId,
+			dto.Orders[0].DateCreated)
 		if err != nil {
 			log.Fatal(err)
 		}
