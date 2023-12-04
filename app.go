@@ -77,11 +77,13 @@ func main() {
 
 		sqlStatement := `INSERT INTO list_orders (OrderId, Status, StoreId, DateCreated) VALUES ($1, $2, $3, $4)`
 
+		order := dto.Orders[0]
+
 		_, err = db.Exec(sqlStatement,
-			dto.Orders[0].OrderId,
-			dto.Orders[0].Status,
-			dto.Orders[0].StoreId,
-			dto.Orders[0].DateCreated)
+			order.OrderId,
+			order.Status,
+			order.StoreId,
+			order.DateCreated)
 		if err != nil {
 			log.Fatal(err)
 		}
