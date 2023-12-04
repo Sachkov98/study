@@ -54,7 +54,6 @@ func main() {
 		err = json.Unmarshal(body, &orders1)
 
 		if err != nil {
-
 			log.Fatal(err)
 		}
 
