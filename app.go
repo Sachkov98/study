@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type orders struct {
+type contents struct {
 	Content []struct {
 		OrderId     int64  `json:"order_id"`
 		Status      string `json:"status"`
@@ -20,25 +20,31 @@ type orders struct {
 	} `json:"content"`
 }
 
-type connectionString struct {
-	user, password, dbname, sslmode string
+type connectionStrings struct {
+	user     string
+	password string
+	dbname   string
+	sslmode  string
 }
 
 func main() {
 
 	for {
+		orders := contents{}
 
-		var (
-			orders1           orders
-			connectionString1 = connectionString{
-				user:     "myUser",
-				password: "myPassword",
-				dbname:   "postgres",
-				sslmode:  "disable"}
-		)
+		DBconnectionString := connectionStrings{
+			user:     "myUser",
+			password: "myPassword",
+			dbname:   "postgres",
+			sslmode:  "disable"}
+
+		connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s",
+			DBconnectionString.user,
+			DBconnectionString.password,
+			DBconnectionString.dbname,
+			DBconnectionString.sslmode)
 
 		resp, err := http.Get("http://localhost:8081")
-
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -46,49 +52,38 @@ func main() {
 		defer resp.Body.Close()
 
 		body, err := ioutil.ReadAll(resp.Body)
-
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		err = json.Unmarshal(body, &orders1)
-
+		err = json.Unmarshal(body, &orders)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		//connectionString := "user=myUser password=myPassword dbname=postgres sslmode=disable"
-		db, err := sql.Open("postgres", fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s",
-			connectionString1.user,
-			connectionString1.password,
-			connectionString1.dbname,
-			connectionString1.sslmode))
-
+		db, err := sql.Open("postgres", connectionString)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		err = db.Ping()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
-		fmt.Println("Успешное подключение к БД")
 		defer db.Close()
 
-		sqlStatement := `INSERT INTO list (OrderId, Status, StoreId, DateCreated) VALUES ($1, $2, $3, $4)`
+		sqlStatement := `INSERT INTO list_orders (OrderId, Status, StoreId, DateCreated) VALUES ($1, $2, $3, $4)`
+
 		_, err = db.Exec(sqlStatement,
-			orders1.Content[0].OrderId,
-			orders1.Content[0].Status,
-			orders1.Content[0].StoreId,
-			orders1.Content[0].DateCreated)
-
+			orders.Content[0].OrderId,
+			orders.Content[0].Status,
+			orders.Content[0].StoreId,
+			orders.Content[0].DateCreated)
 		if err != nil {
-			panic(err)
-		} else {
-			fmt.Println("\nRow inserted successfully!")
+			log.Fatal(err)
 		}
-		time.Sleep(60 * time.Second)
 
+		time.Sleep(60 * time.Second)
 	}
 }
