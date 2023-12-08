@@ -1,31 +1,30 @@
 package services
 
 import (
-	"study/app/adapters/secondary/providers"
+	"study/app/adapters/secondary/gateways"
 	"study/app/adapters/secondary/repositories"
-	"time"
 )
 
 type service struct {
 }
 
-func New(I) *service {
+func New() interface{} {
 	serv := service{}
 	return &serv
 }
 
-type I interface {
+type GatewayInterface interface {
 	GetBody()
-	InsertTable()
 }
 
-var Intf I
+type RepositoryInterface interface {
+	DbInit()
+	InsertListOrdersToDb()
+}
 
-func (s service) GetNDrop() {
-	for {
-		providers.New().GetBody()
-		repositories.New().InsertTable()
-		time.Sleep(60 * time.Second)
-	}
+func (s service) start() {
+	gateways.New().GetBody()
+	repositories.New().DbInit()
+	repositories.New().InsertListOrdersToDb()
 
 }

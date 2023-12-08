@@ -3,9 +3,9 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
+	_ "github.codatabase/sqlm/lib/pq"
 	"log"
-	"study/app/adapters/secondary/providers"
+	"study/app/adapters/secondary/gateways"
 )
 
 type repository struct{}
@@ -22,19 +22,19 @@ type connectionStrings struct {
 	sslmode  string
 }
 
-func (rep repository) InsertTable() {
+func (rep repository) ConnectToDataBase() (sql.DB, error){
 
-	DBconnectionString := connectionStrings{
+	dbconnectionString := connectionStrings{
 		user:     "myUser",
 		password: "myPassword",
 		dbname:   "postgres",
 		sslmode:  "disable"}
 
 	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s",
-		DBconnectionString.user,
-		DBconnectionString.password,
-		DBconnectionString.dbname,
-		DBconnectionString.sslmode)
+		dbconnectionString.user,
+		dbconnectionString.password,
+		dbconnectionString.dbname,
+		dbconnectionString.sslmode)
 
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
@@ -46,13 +46,17 @@ func (rep repository) InsertTable() {
 		log.Fatal(err)
 	}
 
-	defer db.Close()
+	//defer db.Close()
+	return db, err
+}
+
+func (rep repository) InsertListOrdersToDb() {
 
 	sqlStatement := `INSERT INTO list_orders (OrderId, Status, StoreId, DateCreated) VALUES ($1, $2, $3, $4)`
 
-	order := providers.Dto.Orders[0]
+	order := gateways.New().GetBody
 
-	_, err = db.Exec(sqlStatement,
+	_, err = .Exec(sqlStatement,
 		order.OrderId,
 		order.Status,
 		order.StoreId,

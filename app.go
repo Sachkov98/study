@@ -1,9 +1,10 @@
 package main
 
 import (
-	"study/app/services"
+	"fmt"
+	"study/app/adapters/secondary/gateways"
 )
 
 func main() {
-	services.New(services.Intf).GetNDrop()
+	fmt.Println(gateways.New().GetOrders())
 }

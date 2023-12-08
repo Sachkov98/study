@@ -1,4 +1,4 @@
-package providers
+package gateways
 
 import (
 	"encoding/json"
@@ -7,11 +7,10 @@ import (
 	"net/http"
 )
 
-type provider struct {
-}
+type gateway struct{}
 
-func New() *provider {
-	prov := provider{}
+func New() *gateway {
+	prov := gateway{}
 	return &prov
 }
 
@@ -26,9 +25,9 @@ type DTO struct {
 	Orders []Order `json:"content"`
 }
 
-var Dto DTO
+func (g gateway) getOrders() ([]Order, error) {
 
-func (p provider) GetBody() {
+	var dto DTO
 
 	resp, err := http.Get("http://localhost:8081")
 	if err != nil {
@@ -42,9 +41,9 @@ func (p provider) GetBody() {
 		log.Fatal(err)
 	}
 
-	err = json.Unmarshal(body, &Dto)
+	err = json.Unmarshal(body, &dto)
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	return dto.Orders, err
 }
