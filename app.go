@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"study/app/adapters/secondary/gateways"
+	"study/app/adapters/secondary/repositories"
+	"study/app/services"
 )
 
 func main() {
-	fmt.Println(gateways.New().GetOrders())
+	services.New(repositories.New(), gateways.New()).Start()
 }

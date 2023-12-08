@@ -25,7 +25,7 @@ type DTO struct {
 	Orders []Order `json:"content"`
 }
 
-func (g gateway) getOrders() ([]Order, error) {
+func (g gateway) GetOrders() ([]Order, error) {
 
 	var dto DTO
 

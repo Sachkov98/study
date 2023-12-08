@@ -3,7 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
-	_ "github.codatabase/sqlm/lib/pq"
+	_ "github.com/lib/pq"
 	"log"
 	"study/app/adapters/secondary/gateways"
 )
@@ -22,7 +22,7 @@ type connectionStrings struct {
 	sslmode  string
 }
 
-func (rep repository) ConnectToDataBase() (sql.DB, error){
+func (rep repository) ConnectToDb() (*sql.DB, error) {
 
 	dbconnectionString := connectionStrings{
 		user:     "myUser",
@@ -50,18 +50,18 @@ func (rep repository) ConnectToDataBase() (sql.DB, error){
 	return db, err
 }
 
-func (rep repository) InsertListOrdersToDb() {
+func (rep repository) InsertOrdersToDb(ord []gateways.Order, db *sql.DB) error {
 
-	sqlStatement := `INSERT INTO list_orders (OrderId, Status, StoreId, DateCreated) VALUES ($1, $2, $3, $4)`
+	sqlStatement := `INSERT INTO orders (OrderId, Status, StoreId, DateCreated) VALUES ($1, $2, $3, $4)`
 
-	order := gateways.New().GetBody
-
-	_, err = .Exec(sqlStatement,
-		order.OrderId,
-		order.Status,
-		order.StoreId,
-		order.DateCreated)
+	orders := ord[0]
+	_, err := db.Exec(sqlStatement,
+		orders.OrderId,
+		orders.Status,
+		orders.StoreId,
+		orders.DateCreated)
 	if err != nil {
 		log.Fatal(err)
 	}
+	return err
 }
