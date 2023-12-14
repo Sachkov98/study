@@ -4,14 +4,15 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
-	"log"
-	"study/app/adapters/secondary/gateways"
+	"study/app/domain/order"
 )
 
-type repository struct{}
+type Repository struct {
+	dateBase *sql.DB
+}
 
-func New() *repository {
-	repo := repository{}
+func New() *Repository {
+	repo := Repository{}
 	return &repo
 }
 
@@ -22,7 +23,7 @@ type connectionStrings struct {
 	sslmode  string
 }
 
-func (rep repository) ConnectToDb() (*sql.DB, error) {
+func (rep *Repository) ConnectToDb() error {
 
 	dbconnectionString := connectionStrings{
 		user:     "myUser",
@@ -37,31 +38,32 @@ func (rep repository) ConnectToDb() (*sql.DB, error) {
 		dbconnectionString.sslmode)
 
 	db, err := sql.Open("postgres", connectionString)
+	rep.dateBase = db
+
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-
-	//defer db.Close()
-	return db, err
+	return nil
 }
 
-func (rep repository) InsertOrdersToDb(ord []gateways.Order, db *sql.DB) error {
+func (rep Repository) InsertOrders(orders []order.Order) error {
 
 	sqlStatement := `INSERT INTO orders (OrderId, Status, StoreId, DateCreated) VALUES ($1, $2, $3, $4)`
 
-	orders := ord[0]
-	_, err := db.Exec(sqlStatement,
-		orders.OrderId,
-		orders.Status,
-		orders.StoreId,
-		orders.DateCreated)
-	if err != nil {
-		log.Fatal(err)
+	for _, order := range orders {
+		_, err := rep.dateBase.Exec(sqlStatement,
+			order.OrderId,
+			order.Status,
+			order.StoreId,
+			order.DateCreated)
+		if err != nil {
+			return err
+		}
 	}
-	return err
+	return nil
 }

@@ -3,47 +3,40 @@ package gateways
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
+	"study/app/domain/order"
 )
 
-type gateway struct{}
+type Gateway struct{}
 
-func New() *gateway {
-	prov := gateway{}
-	return &prov
-}
-
-type Order struct {
-	OrderId     int64  `json:"order_id"`
-	Status      string `json:"status"`
-	StoreId     int64  `json:"store_id"`
-	DateCreated string `json:"date_created"`
+func New() *Gateway {
+	gatew := Gateway{}
+	return &gatew
 }
 
 type DTO struct {
-	Orders []Order `json:"content"`
+	Orders []order.Order `json:"content"`
 }
 
-func (g gateway) GetOrders() ([]Order, error) {
+func (g Gateway) GetOrders() ([]order.Order, error) {
 
 	var dto DTO
 
 	resp, err := http.Get("http://localhost:8081")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	err = json.Unmarshal(body, &dto)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return dto.Orders, err
+	return dto.Orders, nil
 }

@@ -1,35 +1,43 @@
 package services
 
 import (
-	"study/app/adapters/secondary/gateways"
-	"study/app/adapters/secondary/repositories"
+	"fmt"
+	"study/app/domain/order"
 	"time"
 )
 
 type service struct {
+	gateway    OrdersGateway
+	repository OrdersRepository
 }
 
-func New(a, b interface{}) *service {
-	serv := service{}
+func New(gateway OrdersGateway, repository OrdersRepository) *service {
+	serv := service{gateway, repository}
 	return &serv
 }
 
-type GatewayInterface interface {
-	GetOrders()
+type OrdersGateway interface {
+	GetOrders() ([]order.Order, error)
 }
 
-type RepositoryInterface interface {
-	GetOrders()
-	ConnectToDb()
-	InsertOrdersToDb()
+type OrdersRepository interface {
+	ConnectToDb() error
+	InsertOrders([]order.Order) error
 }
 
 func (s service) Start() {
-	for {
-		ord, _ := gateways.New().GetOrders()
-		db, _ := repositories.New().ConnectToDb()
-		repositories.New().InsertOrdersToDb(ord, db)
-		time.Sleep(60 * time.Second)
-	}
 
+	for range time.Tick(time.Second * 60) {
+
+		orders, err := s.gateway.GetOrders()
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		err = s.repository.InsertOrders(orders)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
 }
