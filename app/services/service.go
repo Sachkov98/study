@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"study/app/domain/order"
 	"time"
 )
@@ -21,23 +20,28 @@ type OrdersGateway interface {
 }
 
 type OrdersRepository interface {
-	ConnectToDb() error
 	InsertOrders([]order.Order) error
+}
+
+func (s service) GetOrdersInsertOrders() error {
+	orders, err := s.gateway.GetOrders()
+
+	if err != nil {
+		return err
+
+	}
+
+	err = s.repository.InsertOrders(orders)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s service) Start() {
 
 	for range time.Tick(time.Second * 60) {
-
-		orders, err := s.gateway.GetOrders()
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-
-		err = s.repository.InsertOrders(orders)
-		if err != nil {
-			fmt.Println(err)
-		}
+		s.GetOrdersInsertOrders()
 	}
+
 }
