@@ -1,7 +1,7 @@
 package services
 
 import (
-	"study/app/domain/order"
+	"github.com/Sachkov98/study/app/domain/order"
 )
 
 type GatewayMock struct{}

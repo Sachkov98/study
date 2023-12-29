@@ -1,8 +1,8 @@
 package services
 
 import (
+	"github.com/Sachkov98/study/app/domain/order"
 	_ "github.com/lib/pq"
-	"study/app/domain/order"
 )
 
 type RepositoryMock struct {

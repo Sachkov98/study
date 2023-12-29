@@ -3,8 +3,10 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
+	"github.com/Sachkov98/study/app/adapters/primary/http-adapter/controller"
+	"github.com/Sachkov98/study/app/domain/order"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
-	"study/app/domain/order"
 )
 
 type Repository struct {
@@ -12,8 +14,8 @@ type Repository struct {
 }
 
 func New() *Repository {
-	repo := Repository{}
-	return &repo
+	repository := Repository{}
+	return &repository
 }
 
 type connectionStrings struct {
@@ -38,8 +40,8 @@ func (rep *Repository) ConnectToDb() error {
 		dbconnectionString.sslmode)
 
 	db, err := sql.Open("postgres", connectionString)
-	rep.dateBase = db
 
+	rep.dateBase = db
 	if err != nil {
 		return err
 	}
@@ -66,4 +68,32 @@ func (rep Repository) InsertOrders(orders []order.Order) error {
 		}
 	}
 	return nil
+}
+
+type OrdersIds struct {
+	OrdersIds []int `json:"orders_ids"`
+}
+
+func (rep Repository) GetOrdersByIds(ordersIds controller.OrdersIds) ([]order.Order, error) {
+
+	query := "SELECT * from orders WHERE orderid = ANY ($1)"
+	parametrs := pq.Array(ordersIds.OrdersIds)
+	rows, err := rep.dateBase.Query(query, parametrs)
+
+	if err != nil {
+		return []order.Order{}, err
+	}
+
+	var orders []order.Order
+
+	for rows.Next() {
+		var orderRow order.Order
+		err := rows.Scan(&orderRow.OrderId, &orderRow.Status, &orderRow.StoreId, &orderRow.DateCreated)
+		if err != nil {
+			return []order.Order{}, err
+		}
+		orders = append(orders, orderRow)
+	}
+	defer rows.Close()
+	return orders, err
 }

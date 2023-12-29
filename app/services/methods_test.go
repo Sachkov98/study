@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -14,9 +13,5 @@ func TestStart(t *testing.T) {
 	err := service.GetOrdersInsertOrders()
 	if err != nil {
 		t.Fail()
-	} else {
-		fmt.Println("Ok!")
 	}
-
-	service.Start()
 }

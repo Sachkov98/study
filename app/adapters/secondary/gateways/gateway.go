@@ -2,16 +2,16 @@ package gateways
 
 import (
 	"encoding/json"
+	"github.com/Sachkov98/study/app/domain/order"
 	"io/ioutil"
 	"net/http"
-	"study/app/domain/order"
 )
 
 type Gateway struct{}
 
 func New() *Gateway {
-	gatew := Gateway{}
-	return &gatew
+	gateway := Gateway{}
+	return &gateway
 }
 
 type DTO struct {
