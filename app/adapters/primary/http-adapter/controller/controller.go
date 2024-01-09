@@ -17,10 +17,10 @@ func New(service OrdersService) *Controller {
 }
 
 type OrdersService interface {
-	GetOrders(OrdersIds) ([]order.Order, error)
+	GetOrders([]int) ([]order.Order, error)
 }
 
-type OrdersIds struct {
+type OrdersIdsDTO struct {
 	OrdersIds []int `json:"orders_ids"`
 }
 
@@ -29,18 +29,15 @@ type DTO struct {
 }
 
 func (ctr Controller) GetOrders(w http.ResponseWriter, r *http.Request) {
-
-	decoder := json.NewDecoder(r.Body)
-
-	var ordersIds OrdersIds
+	var ordersIdsDTO OrdersIdsDTO
 	var dto DTO
 
-	err := decoder.Decode(&ordersIds)
+	err := json.NewDecoder(r.Body).Decode(&ordersIdsDTO)
 	if err != nil {
 		fmt.Println("Error occured while decoding the data: ", err)
 	}
 
-	dto.Orders, err = ctr.service.GetOrders(ordersIds)
+	dto.Orders, err = ctr.service.GetOrders(ordersIdsDTO.OrdersIds)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -51,8 +48,6 @@ func (ctr Controller) GetOrders(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-
 	w.Write(req)
-
 	return
 }

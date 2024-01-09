@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"github.com/Sachkov98/study/app/adapters/primary/http-adapter/controller"
 	"github.com/Sachkov98/study/app/domain/order"
 	"time"
 )
@@ -23,10 +22,10 @@ type OrdersGateway interface {
 
 type OrdersRepository interface {
 	InsertOrders([]order.Order) error
-	GetOrdersByIds(controller.OrdersIds) ([]order.Order, error)
+	GetOrdersByIds([]int) ([]order.Order, error)
 }
 
-func (s Service) GetOrdersInsertOrders() error {
+func (s Service) getOrdersInsertOrders() error {
 	orders, err := s.gateway.GetOrders()
 	if err != nil {
 		return err
@@ -42,7 +41,7 @@ func (s Service) GetOrdersInsertOrders() error {
 
 func (s Service) Start() {
 	for range time.Tick(time.Second * 60) {
-		err := s.GetOrdersInsertOrders()
+		err := s.getOrdersInsertOrders()
 		if err != nil {
 			fmt.Println(err)
 			continue
@@ -50,8 +49,8 @@ func (s Service) Start() {
 	}
 }
 
-func (s Service) GetOrders(ordersids controller.OrdersIds) ([]order.Order, error) {
-	ordersIds, err := s.repository.GetOrdersByIds(ordersids)
+func (s Service) GetOrders(ordsIds []int) ([]order.Order, error) {
+	ordersIds, err := s.repository.GetOrdersByIds(ordsIds)
 	if err != nil {
 		return []order.Order{}, err
 	}

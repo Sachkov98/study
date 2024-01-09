@@ -2,7 +2,6 @@ package services
 
 import (
 	"github.com/Sachkov98/study/app/domain/order"
-	_ "github.com/lib/pq"
 )
 
 type RepositoryMock struct {
@@ -13,6 +12,5 @@ func NewRepositoryMock() *RepositoryMock {
 }
 
 func (rep RepositoryMock) InsertOrders(orders []order.Order) error {
-
 	return nil
 }

@@ -3,7 +3,6 @@ package gateways
 import (
 	"encoding/json"
 	"github.com/Sachkov98/study/app/domain/order"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -19,22 +18,14 @@ type DTO struct {
 }
 
 func (g Gateway) GetOrders() ([]order.Order, error) {
-
 	var dto DTO
-
-	resp, err := http.Get("http://localhost:8081")
+	client := &http.Client{}
+	resp, err := client.Get("http://localhost:8081")
 	if err != nil {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(body, &dto)
+	err = json.NewDecoder(resp.Body).Decode(&dto)
 	if err != nil {
 		return nil, err
 	}

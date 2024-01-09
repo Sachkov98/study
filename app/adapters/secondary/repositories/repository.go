@@ -3,7 +3,6 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
-	"github.com/Sachkov98/study/app/adapters/primary/http-adapter/controller"
 	"github.com/Sachkov98/study/app/domain/order"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -40,11 +39,11 @@ func (rep *Repository) ConnectToDb() error {
 		dbconnectionString.sslmode)
 
 	db, err := sql.Open("postgres", connectionString)
-
-	rep.dateBase = db
 	if err != nil {
 		return err
 	}
+
+	rep.dateBase = db
 
 	err = db.Ping()
 	if err != nil {
@@ -74,10 +73,10 @@ type OrdersIds struct {
 	OrdersIds []int `json:"orders_ids"`
 }
 
-func (rep Repository) GetOrdersByIds(ordersIds controller.OrdersIds) ([]order.Order, error) {
+func (rep Repository) GetOrdersByIds(ordersIds []int) ([]order.Order, error) {
 
 	query := "SELECT * from orders WHERE orderid = ANY ($1)"
-	parametrs := pq.Array(ordersIds.OrdersIds)
+	parametrs := pq.Array(ordersIds)
 	rows, err := rep.dateBase.Query(query, parametrs)
 
 	if err != nil {
