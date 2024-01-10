@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"github.com/Sachkov98/study/app/domain/order"
 	"github.com/lib/pq"
-	_ "github.com/lib/pq"
 )
 
 type Repository struct {
-	dateBase *sql.DB
+	dataBase *sql.DB
 }
 
 func New() *Repository {
@@ -17,7 +16,7 @@ func New() *Repository {
 	return &repository
 }
 
-type connectionStrings struct {
+type config struct {
 	user     string
 	password string
 	dbname   string
@@ -25,39 +24,36 @@ type connectionStrings struct {
 }
 
 func (rep *Repository) ConnectToDb() error {
-
-	dbconnectionString := connectionStrings{
+	config := config{
 		user:     "myUser",
 		password: "myPassword",
 		dbname:   "postgres",
 		sslmode:  "disable"}
 
 	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s",
-		dbconnectionString.user,
-		dbconnectionString.password,
-		dbconnectionString.dbname,
-		dbconnectionString.sslmode)
+		config.user,
+		config.password,
+		config.dbname,
+		config.sslmode)
 
-	db, err := sql.Open("postgres", connectionString)
+	dataBase, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		return err
 	}
 
-	rep.dateBase = db
-
-	err = db.Ping()
+	err = dataBase.Ping()
 	if err != nil {
 		return err
 	}
+
+	rep.dataBase = dataBase
 	return nil
 }
 
 func (rep Repository) InsertOrders(orders []order.Order) error {
-
 	sqlStatement := `INSERT INTO orders (OrderId, Status, StoreId, DateCreated) VALUES ($1, $2, $3, $4)`
-
 	for _, order := range orders {
-		_, err := rep.dateBase.Exec(sqlStatement,
+		_, err := rep.dataBase.Exec(sqlStatement,
 			order.OrderId,
 			order.Status,
 			order.StoreId,
@@ -69,30 +65,23 @@ func (rep Repository) InsertOrders(orders []order.Order) error {
 	return nil
 }
 
-type OrdersIds struct {
-	OrdersIds []int `json:"orders_ids"`
-}
-
 func (rep Repository) GetOrdersByIds(ordersIds []int) ([]order.Order, error) {
-
 	query := "SELECT * from orders WHERE orderid = ANY ($1)"
 	parametrs := pq.Array(ordersIds)
-	rows, err := rep.dateBase.Query(query, parametrs)
-
+	rows, err := rep.dataBase.Query(query, parametrs)
 	if err != nil {
 		return []order.Order{}, err
 	}
 
 	var orders []order.Order
-
 	for rows.Next() {
-		var orderRow order.Order
-		err := rows.Scan(&orderRow.OrderId, &orderRow.Status, &orderRow.StoreId, &orderRow.DateCreated)
+		var order order.Order
+		err := rows.Scan(&order.OrderId, &order.Status, &order.StoreId, &order.DateCreated)
 		if err != nil {
-			return []order.Order{}, err
+			return nil, err
 		}
-		orders = append(orders, orderRow)
+		orders = append(orders, order)
 	}
 	defer rows.Close()
-	return orders, err
+	return orders, nil
 }

@@ -49,10 +49,10 @@ func (s Service) Start() {
 	}
 }
 
-func (s Service) GetOrders(ordsIds []int) ([]order.Order, error) {
-	ordersIds, err := s.repository.GetOrdersByIds(ordsIds)
+func (s Service) GetOrders(ordersIds []int) ([]order.Order, error) {
+	orders, err := s.repository.GetOrdersByIds(ordersIds)
 	if err != nil {
 		return []order.Order{}, err
 	}
-	return ordersIds, nil
+	return orders, nil
 }

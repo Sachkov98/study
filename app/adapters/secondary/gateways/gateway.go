@@ -6,7 +6,9 @@ import (
 	"net/http"
 )
 
-type Gateway struct{}
+type Gateway struct {
+	client http.Client
+}
 
 func New() *Gateway {
 	gateway := Gateway{}
@@ -18,14 +20,14 @@ type DTO struct {
 }
 
 func (g Gateway) GetOrders() ([]order.Order, error) {
-	var dto DTO
-	client := &http.Client{}
-	resp, err := client.Get("http://localhost:8081")
+
+	response, err := g.client.Get("http://localhost:8081")
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.NewDecoder(resp.Body).Decode(&dto)
+	var dto DTO
+	err = json.NewDecoder(response.Body).Decode(&dto)
 	if err != nil {
 		return nil, err
 	}
