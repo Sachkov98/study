@@ -11,6 +11,5 @@ func NewGatewayMock() *GatewayMock {
 }
 
 func (g GatewayMock) GetOrders() ([]order.Order, error) {
-
 	return nil, nil
 }

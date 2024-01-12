@@ -1,0 +1,215 @@
+run:
+  concurrency: 4
+  timeout: 2m
+  issues-exit-code: 1
+  tests: true
+  skip-dirs:
+  - internal/pkg
+#  skip-files:
+#
+output:
+
+  format: colored-line-number
+
+  # Print lines of code with issue.
+  # Default: true
+  #  print-issued-lines: false
+  print-issued-lines: true
+
+  print-linter-name: true
+
+  # Make issues output unique by line.
+  # Default: true
+  uniq-by-line: true
+#  uniq-by-line: false
+
+linters:
+  # Disable all linters. (It doesn't disable linters listed below, only default ones)
+  # Default: false
+  disable-all: true
+  enable:
+  - asciicheck
+  - bodyclose
+  - cyclop
+  # - deadcode
+  # - depguard
+  - dogsled
+  - dupl
+  - errcheck
+  - errname
+  - exhaustive
+  #	- exhaustruct
+  - exportloopref
+  - forbidigo
+  - forcetypeassert
+  - funlen
+  - gci
+  - gochecknoinits
+  - gocognit
+  - goconst
+  - gocritic
+  - gocyclo
+  - godot
+  - godox
+  #	- goerr113
+  - gofmt
+  - gofumpt
+  - goheader
+  - goimports
+  #	- gomnd не поддерживаются исключения в 1.42
+  - gomoddirectives
+  - gomodguard
+  - goprintffuncname
+  # - gosec
+  - gosimple
+  - govet
+  - importas
+  - ineffassign
+  - makezero
+  - misspell
+  - nakedret
+  - nestif
+  - nilerr
+  - nlreturn
+  - noctx
+  - nolintlint
+  #	- paralleltest
+  - prealloc
+  - predeclared
+  - promlinter
+  # - revive
+  #	- rowserrcheck
+  #	- sqlclosecheck
+  - staticcheck
+  # - structcheck
+  - stylecheck
+  - thelper
+  - tparallel
+  - typecheck
+  - unconvert
+  - unparam
+  - unused
+  # - varcheck
+  - wastedassign
+  - whitespace
+  - wsl
+
+
+linters-settings:
+  wrapcheck:
+  # An array of strings that specify substrings of signatures to ignore.
+  # If this set, it will override the default set of ignored signatures.
+  # See https://github.com/tomarrell/wrapcheck#configuration for more information.
+  ignoreSigs:
+    - .WrapError(
+
+  varnamelen:
+  # The longest distance, in source lines, that is being considered a "small scope".
+  # Variables used in at most this many lines will be ignored.
+  # Default: 5
+  max-distance: 6
+  ignore-names:
+    - l
+    - cfg
+    - db
+    - wg
+    - r
+
+  staticcheck:
+    # Select the Go version to target.
+    # Default: 1.13
+    #	go: "1.15"
+    # https://staticcheck.io/docs/options#checks
+    #	checks: ["all",
+    #         	"-ST1000", #  Incorrect or missing package comment
+    #         	"-ST1003", # should not use MixedCaps in package name
+    #	]
+
+  stylecheck:
+    # Deprecated: use the global `run.go` instead.
+    go: "1.15"
+    # STxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
+    # Default: ["*"]
+    checks: ["all", "-ST1000", "-ST1003", "-ST1016", "-ST1020", "-ST1021", "-ST1022"]
+    # https://staticcheck.io/docs/configuration/options/#dot_import_whitelist
+    # Default: ["github.com/mmcloughlin/avo/build", "github.com/mmcloughlin/avo/operand", "github.com/mmcloughlin/avo/reg"]
+    dot-import-whitelist:
+      - fmt
+    # https://staticcheck.io/docs/configuration/options/#initialisms
+    # Default: ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "SIP", "RTP", "AMQP", "DB", "TS"]
+    initialisms: ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "SIP", "RTP", "AMQP", "DB", "TS"]
+    # https://staticcheck.io/docs/configuration/options/#http_status_code_whitelist
+    # Default: ["200", "400", "404", "500"]
+    http-status-code-whitelist: ["200", "400", "404", "500"]
+
+
+
+  # List of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
+  checks:
+    - argument
+    - case
+    - condition
+    - operation
+    - return
+    - assign
+  # List of numbers to exclude from analysis.
+  # The numbers should be written as string.
+  # Values always ignored: "1", "1.0", "0" and "0.0"
+  #	ignored-numbers:
+  #  	- '0666'
+
+  # List of file patterns to exclude from analysis.
+  # Values always ignored: `.+_test.go`
+  #	ignored-files:
+  #  	- 'magic1_.*.go'
+  # List of function patterns to exclude from analysis.
+  # Values always ignored: `time.Time`
+  ignored-functions:
+    - 'context.*'
+
+  revive:
+  rules:
+    - name: var-naming
+      severity: warning
+      disabled: true
+
+issues:
+  exclude-rules:
+  - path: pkg
+    linters:
+      - unused
+  #	- linters:
+  #    	- stylecheck
+  #  	text: "ST1000:"
+
+  # Independently of option `exclude` we use default exclude patterns,
+  # it can be disabled by this option.
+  # To list all excluded by default patterns execute `golangci-lint run --help`.
+  # Default: true.
+  exclude-use-default: false
+  # If set to true exclude and exclude-rules regular expressions become case-sensitive.
+  # Default: false
+  exclude-case-sensitive: false
+
+  # Maximum issues count per one linter.
+  # Set to 0 to disable.
+  # Default: 50
+  max-issues-per-linter: 0
+
+  # Maximum count of issues with the same text.
+  # Set to 0 to disable.
+  # Default: 3
+  max-same-issues: 0
+
+  # Show only new issues: if there are unstaged changes or untracked files,
+  # only those changes are analyzed, else only changes in HEAD~ are analyzed.
+  # It's a super-useful option for integration of golangci-lint into existing large codebase.
+  # It's not practical to fix all existing issues at the moment of integration:
+  # much better don't allow issues in new code.
+  #
+  # Default: false.
+  new: false
+
+  # Fix found issues (if it's supported by the linter).
+  fix: true
+

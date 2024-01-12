@@ -2,9 +2,10 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/Sachkov98/study/app/domain/order"
+	"log"
 	"net/http"
+
+	"github.com/Sachkov98/study/app/domain/order"
 )
 
 type Controller struct {
@@ -13,6 +14,7 @@ type Controller struct {
 
 func New(service OrdersService) *Controller {
 	controller := Controller{service}
+
 	return &controller
 }
 
@@ -29,26 +31,35 @@ type ordersDTO struct {
 }
 
 func (ctr Controller) GetOrders(w http.ResponseWriter, r *http.Request) {
-
 	var ordersIdsDto ordersIdsDTO
+
 	err := json.NewDecoder(r.Body).Decode(&ordersIdsDto)
 	if err != nil {
-		fmt.Println("Error occured while decoding the data: ", err)
+		log.Println("Error occurred while decoding the data: ", err)
+
 		return
 	}
 
 	var dto ordersDTO
+
 	dto.Orders, err = ctr.service.GetOrders(ordersIdsDto.OrdersIds)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
+
 		return
 	}
 
 	request, err := json.Marshal(dto)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
+
 		return
 	}
-	w.Write(request)
-	return
+
+	_, err = w.Write(request)
+	if err != nil {
+		log.Println(err)
+
+		return
+	}
 }

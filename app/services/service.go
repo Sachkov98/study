@@ -1,9 +1,10 @@
 package services
 
 import (
-	"fmt"
-	"github.com/Sachkov98/study/app/domain/order"
+	"log"
 	"time"
+
+	"github.com/Sachkov98/study/app/domain/order"
 )
 
 type Service struct {
@@ -13,6 +14,7 @@ type Service struct {
 
 func New(gateway OrdersGateway, repository OrdersRepository) *Service {
 	service := Service{gateway, repository}
+
 	return &service
 }
 
@@ -43,7 +45,8 @@ func (s Service) Start() {
 	for range time.Tick(time.Second * 60) {
 		err := s.getOrdersInsertOrders()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
+
 			continue
 		}
 	}
@@ -54,5 +57,6 @@ func (s Service) GetOrders(ordersIds []int) ([]order.Order, error) {
 	if err != nil {
 		return []order.Order{}, err
 	}
+
 	return orders, nil
 }
