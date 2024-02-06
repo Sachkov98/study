@@ -23,7 +23,7 @@ type DTO struct {
 }
 
 func (g Gateway) GetOrders() ([]order.Order, error) {
-	const url = "http://localhost:8081"
+	const url = "http://orders_api:8080"
 
 	context := context.Background()
 
@@ -32,7 +32,19 @@ func (g Gateway) GetOrders() ([]order.Order, error) {
 		return nil, err
 	}
 
-	response, _ := g.client.Do(req)
+	response, err := g.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		closeErr := response.Body.Close()
+		if closeErr != nil {
+			if err == nil {
+				err = closeErr
+			}
+		}
+	}()
 
 	var dto DTO
 
@@ -40,13 +52,6 @@ func (g Gateway) GetOrders() ([]order.Order, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	defer func() {
-		if err == nil {
-			err = response.Body.Close()
-			return
-		}
-	}()
 
 	return dto.Orders, nil
 }

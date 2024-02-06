@@ -1,13 +1,12 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
 	"github.com/Sachkov98/study/app/adapters/primary/http-adapter/controller"
 	"github.com/Sachkov98/study/app/adapters/secondary/gateways"
 	"github.com/Sachkov98/study/app/adapters/secondary/repositories"
 	"github.com/Sachkov98/study/app/services"
+	"log"
+	"net/http"
 )
 
 func main() {
@@ -18,7 +17,7 @@ func main() {
 
 	err := repository.ConnectToDB()
 	if err != nil {
-		log.Fatal()
+		log.Fatal(err)
 	}
 
 	go service.Start()
@@ -27,8 +26,8 @@ func main() {
 
 	log.Println("Listening...")
 
-	err = http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":8083", nil)
 	if err != nil {
-		log.Fatal()
+		log.Fatal(err)
 	}
 }
