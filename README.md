@@ -1,2 +1,2 @@
 # study
-This is my first Golang project :)
+This is my first Golang project =)
