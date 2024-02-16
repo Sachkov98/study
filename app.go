@@ -1,12 +1,14 @@
 package main
 
 import (
+	"log"
+	"net/http"
+	"time"
+
 	"github.com/Sachkov98/study/app/adapters/primary/http-adapter/controller"
 	"github.com/Sachkov98/study/app/adapters/secondary/gateways"
 	"github.com/Sachkov98/study/app/adapters/secondary/repositories"
 	"github.com/Sachkov98/study/app/services"
-	"log"
-	"net/http"
 )
 
 func main() {
@@ -15,6 +17,7 @@ func main() {
 	service := services.New(gateway, repository)
 	controller := controller.New(service)
 
+	time.Sleep(5 * time.Second)
 	err := repository.ConnectToDB()
 	if err != nil {
 		log.Fatal(err)

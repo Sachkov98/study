@@ -32,7 +32,7 @@ func (rep *Repository) ConnectToDB() error {
 		Port:     5432,
 		User:     "myUser",
 		Password: "myPassword",
-		DbName:   "postgres",
+		DbName:   "myDb",
 	}
 
 	connectionString := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=disable",
